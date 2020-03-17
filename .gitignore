@@ -1,0 +1,3 @@
+eicar.txt
+*.pyc
+*__pycache__/
