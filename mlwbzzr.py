@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-from exceptions import *
 from network import send_post
 from mwbzr import *
+from exceptions import NoApiKeyException, FileNameRequiredException
 
 class MlwBzzrClient():
     def __init__(self, api_key=None):
@@ -25,15 +25,19 @@ class MlwBzzrClient():
         if references is not None and type(references) is dict:
             data['references'] = references
 
-        ret = send_post(self.api_url, self.api_key, filename=file, data=data)
-        return ret
+        response = send_post(self.api_url, self.api_key, filename=file, data=data)
+        return response
     
     def get_file(self, sha256_hash) -> Response:
+        if self.api_key is None:
+            raise NoApiKeyException
         data = {'query': 'get_file'}
         data['sha256_hash'] = sha256_hash
         return send_post(self.api_url, self.api_key, data=data)
 
     def get_info(self, hash) -> Sample:
+        if self.api_key is None:
+            raise NoApiKeyException
         data = {'query': 'get_info'}
         data['hash'] = hash
         r = send_post(self.api_url, self.api_key, data=data)
@@ -43,6 +47,8 @@ class MlwBzzrClient():
             return None
 
     def update(self, sha256_hash, key, value) -> Response:
+        if self.api_key is None:
+            raise NoApiKeyException
         data = {'query': 'update'}
         data['sha256_hash'] = sha256_hash
         data['key'] = key
@@ -51,6 +57,8 @@ class MlwBzzrClient():
         return r
 
     def add_comment(self, sha256_hash, comment) -> Response:
+        if self.api_key is None:
+            raise NoApiKeyException
         data = {'query': 'add_comment'}
         data['sha256_hash'] = sha256_hash
         data['comment'] = comment
@@ -58,6 +66,8 @@ class MlwBzzrClient():
         return r
 
     def get_recent(self, selector) -> [Sample]:
+        if self.api_key is None:
+            raise NoApiKeyException
         data = {'query': 'get_recent'}
         data['selector'] = selector
         r = send_post(self.api_url, self.api_key, data=data)
@@ -67,7 +77,7 @@ class MlwBzzrClient():
             return None
 
 client = MlwBzzrClient(api_key="API_KEY_HERE")
-client.send_file("eicar.txt", anonymous=1, tags=['txt', 'eicar'])
+response = client.send_file("eicar.txt", anonymous=1, tags=['txt', 'eicar'])
 resp = client.get_file('9fb0455e55cb6c60081c8344e3c2b65f0425eef03163e8a0e15d3ff825fab476')
 sample = client.get_info('9fb0455e55cb6c60081c8344e3c2b65f0425eef03163e8a0e15d3ff825fab476')
 client.update('d9b05da007d51cf86d4a6448d17183ab69a195436fe17b497185149676d0e77b', 'links', 'test')

@@ -1,0 +1,2 @@
+class HttpPostException(Exception):
+    pass

@@ -1,0 +1,2 @@
+class IncorrectHashException(Exception):
+    pass

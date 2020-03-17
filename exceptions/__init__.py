@@ -1,2 +1,5 @@
 from .NoApiKeyException import NoApiKeyException
 from .FileNameRequiredException import FileNameRequiredException
+from .FileNotKnownException import FileNotKnownException
+from .HttpPostException import HttpPostException
+from .IncorrectHashException import IncorrectHashException
