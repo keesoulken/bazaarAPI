@@ -1,2 +1,0 @@
-class FileNotKnownException(Exception):
-    pass

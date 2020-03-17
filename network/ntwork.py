@@ -20,6 +20,7 @@ def send_post(endpoint, api_key, filename=None, data=None) -> Response:
     if 'json' in ct:
         _data = resp.json()
         response = Response.parseResponse(_data)
+    print(response.query_status)
     if response.query_status == 'http_post_expected':
         raise HttpPostException('The API expected a HTTP POST request')
     if response.query_status == 'illegal_sha256_hash':
@@ -36,5 +37,6 @@ def send_post(endpoint, api_key, filename=None, data=None) -> Response:
         raise FileNameRequiredException('You did not send any file')
     if response.query_status == 'user_blacklisted':
         raise NoApiKeyException('Your API key is blacklisted. Please contact coSntacPtAmeM@abuse.ch (remove all capital letters)')
-
+    if response.query_status == 'unknown_api_key':
+        raise NoApiKeyException('You did not provide a correct API key')
     return response
