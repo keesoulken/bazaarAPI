@@ -10,7 +10,7 @@ def send_post(endpoint, api_key, filename=None, data=None) -> Response:
         resp = requests.post(endpoint, headers=headers, data=data)
     else:
         files['file'] = (open(filename, 'rb'))
-        files['data'] = (None, json.dumps(data), 'application/json')
+        files['json_data'] = (None, json.dumps(data), 'application/json')
         resp = requests.post(endpoint, headers=headers, files=files)
 
     ct = resp.headers['Content-Type']
