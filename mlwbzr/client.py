@@ -49,17 +49,22 @@ class Client():
             data['references'] = references
 
         response = send_post(self.api_url, self.api_key, filename=file, data=data)
-        return response
+        print(response)
+        return response.data
 
     
-    def get_file(self, sha256_hash) -> Response:
+    def get_file(self, sha256_hash) -> Optional[bytes]:
         if self.api_key is None:
             raise NoApiKeyException
         data = {'query': 'get_file'}
         data['sha256_hash'] = sha256_hash
-        return send_post(self.api_url, self.api_key, data=data)
+        r = send_post(self.api_url, self.api_key, data=data)
+        if r.data is not None:
+            return r.data
+        else:
+            return None
 
-    def get_info(self, hash) -> Sample:
+    def get_info(self, hash) -> Optional[Sample]:
         if self.api_key is None:
             raise NoApiKeyException
         data = {'query': 'get_info'}
@@ -73,8 +78,7 @@ class Client():
     def update(self, sha256_hash, key, value) -> Response:
         if self.api_key is None:
             raise NoApiKeyException
-        return self.__query_one(query='update', sha256_hash=sha256_hash, key=key, value=value)
-
+        return self.__query(query='update', sha256_hash=sha256_hash, key=key, value=value)
     def add_comment(self, sha256_hash, comment) -> Response:
         if self.api_key is None:
             raise NoApiKeyException

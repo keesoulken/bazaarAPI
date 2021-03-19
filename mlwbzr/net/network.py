@@ -20,8 +20,15 @@ def send_post(endpoint, api_key, filename=None, data=None) -> Response:
     if 'json' in ct:
         _data = resp.json()
         response = Response.parseResponse(_data)
-    if response.query_status == 'ok':
-        return response
+    
+    if response.query_status == 'updated':
+        response.data = {'status': 'updated'}
+    elif response.query_status == 'exists':
+        response.data = {'status': 'exists'}
+    elif response.query_status == 'success':
+        response.data = {'status': 'success'}
+    elif response.query_status == 'inserted':
+        response.data = {'status': 'inserted'}
     elif response.query_status == 'http_post_expected':
         raise HttpPostException('The API expected a HTTP POST request')
     elif response.query_status == 'illegal_sha256_hash':
@@ -71,7 +78,8 @@ def send_post(endpoint, api_key, filename=None, data=None) -> Response:
     elif response.query_status == 'file_already_known':
         raise BazaarException('File is already known')
     elif response.query_status == 'permission_denied':
-        raise BazaarException('You can change only files submited by yourself')
-    else:
-        return response
+        raise BazaarException('The database entry you have tried to update is not owned by your account')
+    elif response.query_status == 'unknown_key':
+        raise BazaarException('The key (add parameter) you wanted to update is not known')
+    return response
         
