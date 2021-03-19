@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-from network import send_post
-from mwbzr import *
-from exceptions import NoApiKeyException, FileNameRequiredException
+from .net.network import send_post
+from .models import *
+from .exceptions import NoApiKeyException, FileNameRequiredException
 
-class MlwBzzrClient():
+class Client():
     def __init__(self, api_key=None):
         self.api_key = api_key
         self.api_url = "https://mb-api.abuse.ch/api/v1/"
@@ -75,13 +75,3 @@ class MlwBzzrClient():
             return Sample.fromjsonlist(r.data)
         else:
             return None
-
-client = MlwBzzrClient(api_key="API_KEY_HERE")
-response = client.send_file("eicar.txt", anonymous=1, tags=['txt', 'eicar'])
-resp = client.get_file('9fb0455e55cb6c60081c8344e3c2b65f0425eef03163e8a0e15d3ff825fab476')
-sample = client.get_info('9fb0455e55cb6c60081c8344e3c2b65f0425eef03163e8a0e15d3ff825fab476')
-client.update('d9b05da007d51cf86d4a6448d17183ab69a195436fe17b497185149676d0e77b', 'links', 'test')
-client.add_comment('d9b05da007d51cf86d4a6448d17183ab69a195436fe17b497185149676d0e77b', 'zaza')
-samples = client.get_recent('time')
-print(len(samples))
-print(samples[-1].file_name)

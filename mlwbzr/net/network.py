@@ -1,5 +1,5 @@
-from mwbzr import Response
-from exceptions import HttpPostException, IncorrectHashException, FileNotKnownException, FileNameRequiredException, NoApiKeyException
+from ..models import Response
+from ..exceptions import HttpPostException, IncorrectHashException, FileNotKnownException, FileNameRequiredException, NoApiKeyException
 import requests
 import json
 
@@ -20,7 +20,6 @@ def send_post(endpoint, api_key, filename=None, data=None) -> Response:
     if 'json' in ct:
         _data = resp.json()
         response = Response.parseResponse(_data)
-    print(response.query_status)
     if response.query_status == 'http_post_expected':
         raise HttpPostException('The API expected a HTTP POST request')
     if response.query_status == 'illegal_sha256_hash':
