@@ -1,5 +1,5 @@
 from ..models import Response
-from ..exceptions import HttpPostException, IncorrectHashException, FileNotKnownException, FileNameRequiredException, NoApiKeyException, SignatureException, NoResultsException
+from ..exceptions import *
 import requests
 import json
 
@@ -20,7 +20,9 @@ def send_post(endpoint, api_key, filename=None, data=None) -> Response:
     if 'json' in ct:
         _data = resp.json()
         response = Response.parseResponse(_data)
-    if response.query_status == 'http_post_expected':
+    if response.query_status == 'ok':
+        return response
+    elif response.query_status == 'http_post_expected':
         raise HttpPostException('The API expected a HTTP POST request')
     elif response.query_status == 'illegal_sha256_hash':
         raise IncorrectHashException('Illegal SHA256 hash provided')
@@ -46,5 +48,30 @@ def send_post(endpoint, api_key, filename=None, data=None) -> Response:
         raise SignatureException('You did not provide a signature')
     elif response.query_status == 'no_results':
         raise NoResultsException('Your query yield no results')
+    elif response.query_status == 'clamav_not_found':
+        raise NoResultsException('The clamav signature you wanted to query is unknown to MalwareBazaar')
+    elif response.query_status == 'illegal_clamav':
+        raise ClamAVException('The text you provided is not a valid ClamAV signature')
+    elif response.query_status == 'no_clamav_provided':
+        raise ClamAVException('You did not provide a clamav signature')
+    elif response.query_status == 'illegal_tlsh':
+        raise NoResultsException('Illegal tlsh hash')
+    elif response.query_status == 'no_tlsh':
+        raise NoResultsException('Illegal telfhash')
+    elif response.query_status == 'yara_not_found':
+        raise ClamAVException('The yara_rule you wanted to query is unknown to MalwareBazaar')
+    elif response.query_status == 'illegal_yara_rule':
+        raise NoResultsException('The text you provided is not a valid yara_rule')
+    elif response.query_status == 'no_yara_rule_provided':
+        raise NoResultsException('You did not provide a yara_rule')
+    elif response.query_status == 'illegal_issuer_cn':
+        raise ClamAVException('The value you provided is not a valid issuer_cn')
+    elif response.query_status == 'no_issuer_cn':
+        raise NoResultsException('You did not provide a issuer_cn')
+    elif response.query_status == 'file_already_known':
+        raise BazaarException('File is already known')
+    elif response.query_status == 'permission_denied':
+        raise BazaarException('You can change only files submited by yourself')
     else:
         return response
+        
