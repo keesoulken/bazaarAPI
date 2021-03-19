@@ -49,7 +49,6 @@ class Client():
             data['references'] = references
 
         response = send_post(self.api_url, self.api_key, filename=file, data=data)
-        print(response)
         return response.data
 
     
