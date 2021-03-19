@@ -1,5 +1,5 @@
 from ..models import Response
-from ..exceptions import HttpPostException, IncorrectHashException, FileNotKnownException, FileNameRequiredException, NoApiKeyException
+from ..exceptions import HttpPostException, IncorrectHashException, FileNotKnownException, FileNameRequiredException, NoApiKeyException, SignatureException, NoResultsException
 import requests
 import json
 
@@ -22,20 +22,29 @@ def send_post(endpoint, api_key, filename=None, data=None) -> Response:
         response = Response.parseResponse(_data)
     if response.query_status == 'http_post_expected':
         raise HttpPostException('The API expected a HTTP POST request')
-    if response.query_status == 'illegal_sha256_hash':
+    elif response.query_status == 'illegal_sha256_hash':
         raise IncorrectHashException('Illegal SHA256 hash provided')
-    if response.query_status == 'no_sha256_hash':
+    elif response.query_status == 'no_sha256_hash':
         raise IncorrectHashException('No SHA256 hash provided')
-    if response.query_status == 'file_not_found':
+    elif response.query_status == 'file_not_found':
         raise FileNotKnownException('The file was not found or is unknown to MalwareBazaar')
-    if response.query_status == 'hash_not_found':
+    elif response.query_status == 'hash_not_found':
         raise FileNotKnownException('The file (hash) you wanted to query is unknown to MalwareBazaar')
-    if response.query_status == 'no_hash_provided':
+    elif response.query_status == 'no_hash_provided':
         raise IncorrectHashException('You did not provide hash')
-    if response.query_status == 'file_expected':
+    elif response.query_status == 'file_expected':
         raise FileNameRequiredException('You did not send any file')
-    if response.query_status == 'user_blacklisted':
+    elif response.query_status == 'user_blacklisted':
         raise NoApiKeyException('Your API key is blacklisted. Please contact coSntacPtAmeM@abuse.ch (remove all capital letters)')
-    if response.query_status == 'unknown_api_key':
+    elif response.query_status == 'unknown_api_key':
         raise NoApiKeyException('You did not provide a correct API key')
-    return response
+    elif response.query_status == 'signature_not_found':
+        raise SignatureException('The signature you wanted to query is unknown to MalwareBazaar')
+    elif response.query_status == 'illegal_signature':
+        raise SignatureException('The text you provided is not a valid signature')
+    elif response.query_status == 'no_signature_provided':
+        raise SignatureException('You did not provide a signature')
+    elif response.query_status == 'no_results':
+        raise NoResultsException('Your query yield no results')
+    else:
+        return response

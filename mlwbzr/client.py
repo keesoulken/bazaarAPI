@@ -75,3 +75,12 @@ class Client():
             return Sample.fromjsonlist(r.data)
         else:
             return None
+
+    def query_tag(self, tag) -> [Sample]:
+        data = {'query': 'get_taginfo'}
+        data['tag'] = tag
+        r = send_post(self.api_url, self.api_key, data=data)
+        if r.data is not None:
+            return Sample.fromjsonlist(r.data)
+        else:
+            return None
